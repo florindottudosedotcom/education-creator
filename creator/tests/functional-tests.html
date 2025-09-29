@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Functional Tests - AI Creator Hub</title>
+  <link rel="stylesheet" href="../assets/css/themes/minimal-theme.css">
+  <style>
+    .test-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--spacing-8);
+    }
+
+    .test-section {
+      margin-bottom: var(--spacing-8);
+      padding: var(--spacing-6);
+      background: var(--surface);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--radius-md);
+    }
+
+    .test-item {
+      padding: var(--spacing-4);
+      margin: var(--spacing-3) 0;
+      border-left: 4px solid var(--border-primary);
+      background: var(--bg-secondary);
+      border-radius: var(--radius-sm);
+    }
+
+    .test-item.pass {
+      border-left-color: var(--color-success);
+    }
+
+    .test-item.fail {
+      border-left-color: var(--color-error);
+    }
+
+    .test-item.running {
+      border-left-color: var(--color-warning);
+    }
+
+    .test-status {
+      display: inline-block;
+      padding: var(--spacing-1) var(--spacing-3);
+      border-radius: var(--radius-sm);
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      margin-right: var(--spacing-3);
+    }
+
+    .test-status.pass {
+      background: var(--color-success);
+      color: white;
+    }
+
+    .test-status.fail {
+      background: var(--color-error);
+      color: white;
+    }
+
+    .test-status.running {
+      background: var(--color-warning);
+      color: white;
+    }
+
+    .test-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--spacing-4);
+      margin-bottom: var(--spacing-6);
+    }
+
+    .summary-card {
+      padding: var(--spacing-6);
+      background: var(--surface);
+      border: 2px solid var(--border-primary);
+      border-radius: var(--radius-md);
+      text-align: center;
+    }
+
+    .summary-number {
+      font-size: 3rem;
+      font-weight: bold;
+      margin: var(--spacing-2) 0;
+    }
+
+    .summary-label {
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      font-size: var(--font-size-sm);
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+  <div class="test-container">
+    <header class="mb-6">
+      <h1>Functional Test Suite</h1>
+      <p class="text-secondary">Automated tests for AI Creator Hub</p>
+    </header>
+
+    <div class="test-summary">
+      <div class="summary-card">
+        <div class="summary-label">Total Tests</div>
+        <div class="summary-number" id="total-tests">0</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-number" id="passed-tests" style="color: var(--color-success);">0</div>
+        <div class="summary-label">Passed</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-number" id="failed-tests" style="color: var(--color-error);">0</div>
+        <div class="summary-label">Failed</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-number" id="duration">0ms</div>
+        <div class="summary-label">Duration</div>
+      </div>
+    </div>
+
+    <button id="run-tests-btn" class="btn btn-primary btn-lg mb-6">
+      Run All Tests
+    </button>
+
+    <!-- Page Loading Tests -->
+    <section class="test-section">
+      <h2>Page Loading Tests</h2>
+      <p class="text-secondary mb-4">Verify all pages load without errors</p>
+      <div id="page-tests"></div>
+    </section>
+
+    <!-- CSS Architecture Tests -->
+    <section class="test-section">
+      <h2>CSS Architecture Tests</h2>
+      <p class="text-secondary mb-4">Validate CSS-first architecture compliance</p>
+      <div id="css-tests"></div>
+    </section>
+
+    <!-- Icon System Tests -->
+    <section class="test-section">
+      <h2>Icon System Tests</h2>
+      <p class="text-secondary mb-4">Verify Lucide icons integration</p>
+      <div id="icon-tests"></div>
+    </section>
+
+    <!-- Provider Tests -->
+    <section class="test-section">
+      <h2>Provider Integration Tests</h2>
+      <p class="text-secondary mb-4">Check provider implementations</p>
+      <div id="provider-tests"></div>
+    </section>
+
+    <!-- State Management Tests -->
+    <section class="test-section">
+      <h2>State Management Tests</h2>
+      <p class="text-secondary mb-4">Verify localStorage and sessionStorage</p>
+      <div id="state-tests"></div>
+    </section>
+  </div>
+
+  <script type="module">
+    class TestRunner {
+      constructor() {
+        this.tests = [];
+        this.results = {
+          passed: 0,
+          failed: 0,
+          total: 0
+        };
+        this.startTime = 0;
+      }
+
+      async runTests() {
+        this.startTime = Date.now();
+        this.results = { passed: 0, failed: 0, total: 0 };
+
+        // Clear previous results
+        document.querySelectorAll('[id$="-tests"]').forEach(el => el.innerHTML = '');
+
+        await this.runPageTests();
+        await this.runCSSTests();
+        await this.runIconTests();
+        await this.runProviderTests();
+        await this.runStateTests();
+
+        this.updateSummary();
+      }
+
+      async runPageTests() {
+        const pages = [
+          { url: '../index.html', name: 'Main Index' },
+          { url: '../course.html', name: 'Course Creator' },
+          { url: '../slides.html', name: 'Slides Creator' },
+          { url: '../openrouter.html', name: 'OpenRouter Provider' },
+          { url: '../webllm.html', name: 'WebLLM Provider' },
+          { url: '../ollama.html', name: 'Ollama Provider' },
+          { url: '../puter.html', name: 'Puter Provider' }
+        ];
+
+        for (const page of pages) {
+          await this.test(
+            'page-tests',
+            `Load ${page.name}`,
+            async () => {
+              const response = await fetch(page.url);
+              return response.ok;
+            }
+          );
+        }
+      }
+
+      async runCSSTests() {
+        await this.test(
+          'css-tests',
+          'CSS variables are defined',
+          async () => {
+            const styles = getComputedStyle(document.documentElement);
+            return styles.getPropertyValue('--spacing-4') !== '';
+          }
+        );
+
+        await this.test(
+          'css-tests',
+          'No inline styles in test page',
+          async () => {
+            const elementsWithStyle = document.querySelectorAll('[style]');
+            return elementsWithStyle.length === 0;
+          }
+        );
+
+        await this.test(
+          'css-tests',
+          'Minimal theme CSS is loaded',
+          async () => {
+            const links = Array.from(document.styleSheets);
+            return links.some(sheet => sheet.href && sheet.href.includes('minimal-theme.css'));
+          }
+        );
+      }
+
+      async runIconTests() {
+        await this.test(
+          'icon-tests',
+          'Lucide icons script is available',
+          async () => {
+            return typeof lucide !== 'undefined';
+          }
+        );
+      }
+
+      async runProviderTests() {
+        const providers = ['openrouter', 'webllm', 'ollama', 'puter'];
+
+        for (const provider of providers) {
+          await this.test(
+            'provider-tests',
+            `${provider}.js module exists`,
+            async () => {
+              try {
+                const module = await import(`../assets/js/providers/${provider}.js`);
+                return module !== null;
+              } catch {
+                return false;
+              }
+            }
+          );
+        }
+      }
+
+      async runStateTests() {
+        await this.test(
+          'state-tests',
+          'localStorage is available',
+          async () => {
+            try {
+              localStorage.setItem('test', 'value');
+              const value = localStorage.getItem('test');
+              localStorage.removeItem('test');
+              return value === 'value';
+            } catch {
+              return false;
+            }
+          }
+        );
+
+        await this.test(
+          'state-tests',
+          'sessionStorage is available',
+          async () => {
+            try {
+              sessionStorage.setItem('test', 'value');
+              const value = sessionStorage.getItem('test');
+              sessionStorage.removeItem('test');
+              return value === 'value';
+            } catch {
+              return false;
+            }
+          }
+        );
+      }
+
+      async test(containerId, name, testFn) {
+        this.results.total++;
+        const container = document.getElementById(containerId);
+
+        const testItem = document.createElement('div');
+        testItem.className = 'test-item running';
+        testItem.innerHTML = `
+          <span class="test-status running">RUNNING</span>
+          <strong>${name}</strong>
+        `;
+        container.appendChild(testItem);
+
+        try {
+          const result = await testFn();
+
+          if (result) {
+            this.results.passed++;
+            testItem.className = 'test-item pass';
+            testItem.innerHTML = `
+              <span class="test-status pass">PASS</span>
+              <strong>${name}</strong>
+            `;
+          } else {
+            this.results.failed++;
+            testItem.className = 'test-item fail';
+            testItem.innerHTML = `
+              <span class="test-status fail">FAIL</span>
+              <strong>${name}</strong>
+            `;
+          }
+        } catch (error) {
+          this.results.failed++;
+          testItem.className = 'test-item fail';
+          testItem.innerHTML = `
+            <span class="test-status fail">FAIL</span>
+            <strong>${name}</strong>
+            <div class="text-secondary" style="margin-top: 8px; font-size: 0.875rem;">
+              Error: ${error.message}
+            </div>
+          `;
+        }
+
+        this.updateSummary();
+      }
+
+      updateSummary() {
+        const duration = Date.now() - this.startTime;
+        document.getElementById('total-tests').textContent = this.results.total;
+        document.getElementById('passed-tests').textContent = this.results.passed;
+        document.getElementById('failed-tests').textContent = this.results.failed;
+        document.getElementById('duration').textContent = `${duration}ms`;
+      }
+    }
+
+    const runner = new TestRunner();
+
+    document.getElementById('run-tests-btn').addEventListener('click', () => {
+      runner.runTests();
+    });
+
+    // Auto-run tests on load
+    window.addEventListener('load', () => {
+      setTimeout(() => runner.runTests(), 500);
+    });
+  </script>
+</body>
+</html>
