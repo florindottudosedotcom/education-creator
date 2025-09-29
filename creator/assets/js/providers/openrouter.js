@@ -3,12 +3,27 @@
  * Handles API communication and content generation
  */
 
-export class OpenRouterProvider {
+import { AIProviderInterface } from '../core/provider-interface.js';
+
+export class OpenRouterProvider extends AIProviderInterface {
   constructor() {
+    super();
     this.apiKey = null;
     this.baseURL = 'https://openrouter.ai/api/v1';
     this.selectedModel = 'openai/gpt-4o';
     this.connected = false;
+  }
+
+  getName() {
+    return 'OpenRouter';
+  }
+
+  getIcon() {
+    return 'globe';
+  }
+
+  isConnected() {
+    return this.connected;
   }
 
   /**
