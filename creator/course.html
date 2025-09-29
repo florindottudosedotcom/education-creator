@@ -43,12 +43,7 @@
       </div>
 
       <div class="provider-content">
-        <div class="card text-center" style="padding: var(--spacing-12);">
-          <i data-lucide="info" style="width: 48px; height: 48px; margin: 0 auto var(--spacing-4); color: var(--color-primary);"></i>
-          <h2>Provider Selection</h2>
-          <p>Provider-specific interfaces will be implemented in Phase 2.</p>
-          <p class="text-secondary">For now, click on any provider tab above to see the tab switching functionality.</p>
-        </div>
+        <iframe id="provider-iframe" src="openrouter.html"></iframe>
       </div>
     </main>
 
@@ -61,8 +56,9 @@
     // Initialize Lucide icons
     lucide.createIcons();
 
-    // Simple tab switching functionality for Phase 1
+    // Provider tab switching functionality
     const tabs = document.querySelectorAll('.tab-btn');
+    const iframe = document.getElementById('provider-iframe');
     const savedProvider = localStorage.getItem('selected_provider');
 
     // Restore saved provider selection
@@ -70,6 +66,7 @@
       tabs.forEach(tab => {
         tab.classList.toggle('active', tab.dataset.provider === savedProvider);
       });
+      iframe.src = `${savedProvider}.html`;
     }
 
     // Tab click handlers
@@ -81,10 +78,11 @@
         tabs.forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
 
+        // Load provider page in iframe
+        iframe.src = `${provider}.html`;
+
         // Save selection
         localStorage.setItem('selected_provider', provider);
-
-        console.log(`Selected provider: ${provider}`);
       });
     });
   </script>

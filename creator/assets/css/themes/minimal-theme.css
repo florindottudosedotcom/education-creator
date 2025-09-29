@@ -16,6 +16,7 @@
 @import '../components/cards.css';
 @import '../components/forms.css';
 @import '../components/tabs.css';
+@import '../components/modals.css';
 
 /* 4. Utilities */
 .hidden {
@@ -100,6 +101,39 @@ html {
 img {
   max-width: 100%;
   height: auto;
+}
+
+/* Editor instance visibility */
+.editor-instance {
+  display: none;
+}
+
+.editor-instance.active {
+  display: block;
+}
+
+/* Form group flex */
+.form-group-flex {
+  flex: 1;
+}
+
+/* Modal actions */
+.modal-actions {
+  gap: var(--spacing-3);
+  margin-top: var(--spacing-6);
+}
+
+/* Card info large */
+.card-info-large {
+  padding: var(--spacing-12);
+}
+
+/* Icon large */
+.icon-large {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto var(--spacing-4);
+  color: var(--color-primary);
 }
 
 /* Print styles */
