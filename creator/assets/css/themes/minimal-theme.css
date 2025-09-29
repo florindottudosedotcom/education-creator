@@ -17,6 +17,7 @@
 @import '../components/forms.css';
 @import '../components/tabs.css';
 @import '../components/modals.css';
+@import '../components/slides.css';
 
 /* 4. Utilities */
 .hidden {

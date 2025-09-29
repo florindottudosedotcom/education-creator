@@ -1,0 +1,111 @@
+/**
+ * Slides Creator Styles
+ * Specific styles for presentation creation interface
+ */
+
+/* Konva Container */
+.konva-container {
+  width: 100%;
+  max-width: 800px;
+  height: 600px;
+  margin: var(--spacing-6) auto;
+  border: 2px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+/* Slide Tabs */
+.tab-container {
+  display: flex;
+  gap: var(--spacing-2);
+  overflow-x: auto;
+  padding: var(--spacing-2);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-4);
+}
+
+.slide-tab {
+  flex-shrink: 0;
+  padding: var(--spacing-3) var(--spacing-4);
+  background: var(--surface);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.slide-tab:hover {
+  background: var(--bg-secondary);
+  border-color: var(--color-primary);
+  color: var(--text-primary);
+}
+
+.slide-tab.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+  font-weight: 600;
+}
+
+/* Export Grid */
+.export-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-4);
+  margin-bottom: var(--spacing-6);
+}
+
+/* Info Card */
+.info-card {
+  padding: var(--spacing-6);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  display: flex;
+  gap: var(--spacing-4);
+}
+
+.info-card i {
+  width: 24px;
+  height: 24px;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.info-card h4 {
+  margin: 0 0 var(--spacing-2) 0;
+  font-size: var(--font-size-lg);
+  color: var(--text-primary);
+}
+
+.info-card p {
+  margin: 0 0 var(--spacing-3) 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.command-block {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-3);
+  font-family: 'Courier New', monospace;
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  overflow-x: auto;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .konva-container {
+    height: 400px;
+  }
+
+  .export-grid {
+    grid-template-columns: 1fr;
+  }
+}

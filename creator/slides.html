@@ -43,12 +43,7 @@
       </div>
 
       <div class="provider-content">
-        <div class="card text-center" style="padding: var(--spacing-12);">
-          <i data-lucide="info" style="width: 48px; height: 48px; margin: 0 auto var(--spacing-4); color: var(--color-primary);"></i>
-          <h2>Provider Selection</h2>
-          <p>Slides creator interfaces will be implemented in Phase 4.</p>
-          <p class="text-secondary">For now, click on any provider tab above to see the tab switching functionality.</p>
-        </div>
+        <iframe id="provider-iframe" class="provider-frame"></iframe>
       </div>
     </main>
 
@@ -61,32 +56,54 @@
     // Initialize Lucide icons
     lucide.createIcons();
 
-    // Simple tab switching functionality for Phase 1
-    const tabs = document.querySelectorAll('.tab-btn');
-    const savedProvider = localStorage.getItem('selected_slides_provider');
+    class SlidesPage {
+      constructor() {
+        this.currentProvider = 'openrouter';
+        this.init();
+      }
 
-    // Restore saved provider selection
-    if (savedProvider) {
-      tabs.forEach(tab => {
-        tab.classList.toggle('active', tab.dataset.provider === savedProvider);
-      });
+      init() {
+        this.bindTabEvents();
+        this.loadSavedProvider();
+      }
+
+      bindTabEvents() {
+        const tabs = document.querySelectorAll('.tab-btn');
+
+        tabs.forEach(tab => {
+          tab.addEventListener('click', () => {
+            const provider = tab.dataset.provider;
+            this.switchProvider(provider);
+          });
+        });
+      }
+
+      switchProvider(provider) {
+        // Update active tab
+        document.querySelectorAll('.tab-btn').forEach(tab => {
+          tab.classList.toggle('active', tab.dataset.provider === provider);
+        });
+
+        // Load provider iframe
+        const iframe = document.getElementById('provider-iframe');
+        iframe.src = `slides/${provider}.html`;
+
+        // Save preference
+        this.currentProvider = provider;
+        localStorage.setItem('selected_slides_provider', provider);
+      }
+
+      loadSavedProvider() {
+        const saved = localStorage.getItem('selected_slides_provider');
+        if (saved) {
+          this.switchProvider(saved);
+        } else {
+          this.switchProvider(this.currentProvider);
+        }
+      }
     }
 
-    // Tab click handlers
-    tabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        const provider = tab.dataset.provider;
-
-        // Update active state
-        tabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-
-        // Save selection
-        localStorage.setItem('selected_slides_provider', provider);
-
-        console.log(`Selected slides provider: ${provider}`);
-      });
-    });
+    new SlidesPage();
   </script>
 </body>
 </html>

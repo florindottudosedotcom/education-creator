@@ -10,6 +10,7 @@ export class CourseManager {
     this.chapters = [];
     this.selectedLanguages = ['en'];
     this.currentChapter = 0;
+    this.translations = {}; // { langCode: { courseName, courseDescription, chapters: [] } }
   }
 
   /**
@@ -110,10 +111,12 @@ export class CourseManager {
 
     // Generate index files for each language
     this.selectedLanguages.forEach(lang => {
-      files[`docs/index.${lang}.md`] = this.generateIndexPage(lang);
+      const content = this.getContentForLanguage(lang);
+
+      files[`docs/index.${lang}.md`] = this.generateIndexPage(lang, content);
 
       // Generate chapter files
-      this.chapters.forEach((chapter, index) => {
+      content.chapters.forEach((chapter, index) => {
         const filename = `docs/chapter-${index + 1}.${lang}.md`;
         files[filename] = chapter.content;
       });
@@ -132,14 +135,14 @@ export class CourseManager {
    * Generate index page content
    * @private
    */
-  generateIndexPage(lang) {
-    return `# ${this.courseName}
+  generateIndexPage(lang, content) {
+    return `# ${content.courseName}
 
-${this.courseDescription}
+${content.courseDescription}
 
 ## Course Structure
 
-${this.chapters.map((ch, i) => `${i + 1}. [${ch.title}](chapter-${i + 1}.${lang}.md)`).join('\n')}
+${content.chapters.map((ch, i) => `${i + 1}. [${ch.title}](chapter-${i + 1}.${lang}.md)`).join('\n')}
 `;
   }
 
@@ -235,5 +238,124 @@ mkdocs-static-i18n>=1.0.0
       zh: '中文'
     };
     return names[code] || code;
+  }
+
+  /**
+   * Translate course content to selected languages
+   * @param {AIProviderInterface} provider - AI provider for translation
+   * @param {Function} progressCallback - Progress callback (current, total, lang)
+   * @returns {Promise<void>}
+   */
+  async translateCourse(provider, progressCallback = null) {
+    const baseLanguage = 'en';
+    const languagesToTranslate = this.selectedLanguages.filter(lang => lang !== baseLanguage);
+
+    if (languagesToTranslate.length === 0) {
+      return; // No translation needed
+    }
+
+    let progress = 0;
+    const totalItems = languagesToTranslate.length * (2 + this.chapters.length); // courseName + description + chapters
+
+    for (const targetLang of languagesToTranslate) {
+      this.translations[targetLang] = {
+        courseName: '',
+        courseDescription: '',
+        chapters: []
+      };
+
+      // Translate course name
+      if (progressCallback) {
+        progressCallback(progress++, totalItems, targetLang, 'course name');
+      }
+      this.translations[targetLang].courseName = await this.translateText(
+        this.courseName,
+        targetLang,
+        provider
+      );
+
+      // Translate course description
+      if (progressCallback) {
+        progressCallback(progress++, totalItems, targetLang, 'description');
+      }
+      this.translations[targetLang].courseDescription = await this.translateText(
+        this.courseDescription,
+        targetLang,
+        provider
+      );
+
+      // Translate each chapter
+      for (let i = 0; i < this.chapters.length; i++) {
+        const chapter = this.chapters[i];
+
+        if (progressCallback) {
+          progressCallback(progress++, totalItems, targetLang, `chapter ${i + 1}`);
+        }
+
+        const translatedTitle = await this.translateText(chapter.title, targetLang, provider);
+        const translatedContent = await this.translateText(chapter.content, targetLang, provider);
+
+        this.translations[targetLang].chapters.push({
+          title: translatedTitle,
+          content: translatedContent
+        });
+      }
+    }
+
+    this.saveState();
+  }
+
+  /**
+   * Translate text to target language
+   * @param {string} text - Text to translate
+   * @param {string} targetLang - Target language code
+   * @param {AIProviderInterface} provider - AI provider
+   * @returns {Promise<string>} Translated text
+   * @private
+   */
+  async translateText(text, targetLang, provider) {
+    const languageName = this.getLanguageName(targetLang);
+    const systemPrompt = `You are a professional translator. Translate the following text to ${languageName}.
+
+Rules:
+- Maintain all markdown formatting (headings, lists, code blocks, links)
+- Keep technical terms accurate
+- Preserve the tone and style
+- Do not add explanations or notes
+- Output ONLY the translated text`;
+
+    try {
+      const response = await provider.enhancePrompt(systemPrompt + '\n\n' + text);
+      return response;
+    } catch (error) {
+      console.error(`Translation error for ${targetLang}:`, error);
+      throw new Error(`Failed to translate to ${languageName}: ${error.message}`);
+    }
+  }
+
+  /**
+   * Check if translations exist for selected languages
+   * @returns {boolean}
+   */
+  hasTranslations() {
+    const nonEnglishLangs = this.selectedLanguages.filter(lang => lang !== 'en');
+    return nonEnglishLangs.some(lang => this.translations[lang]);
+  }
+
+  /**
+   * Get content for a specific language
+   * @param {string} langCode - Language code
+   * @returns {Object} Course content in specified language
+   */
+  getContentForLanguage(langCode) {
+    if (langCode === 'en' || !this.translations[langCode]) {
+      return {
+        courseName: this.courseName,
+        courseDescription: this.courseDescription,
+        chapters: this.chapters
+      };
+    }
+
+    return this.translations[langCode];
   }
 }

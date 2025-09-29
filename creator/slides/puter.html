@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Puter Slides Creator</title>
+  <link rel="stylesheet" href="../assets/css/themes/minimal-theme.css">
+  <link rel="stylesheet" href="../assets/css/components/modals.css">
+  <script src="../assets/js/lucide/lucide.min.js"></script>
+</head>
+<body>
+  <main class="creator-container">
+    <!-- Provider Info -->
+    <section class="provider-section">
+      <div class="provider-header">
+        <div class="provider-title">
+          <i data-lucide="cloud"></i>
+          <h2>Puter</h2>
+        </div>
+        <p class="provider-description">Free access to multiple AI providers - no API key required</p>
+      </div>
+    </section>
+
+    <!-- Authentication Section -->
+    <section class="auth-section">
+      <h3>
+        <i data-lucide="settings"></i>
+        Configuration
+      </h3>
+
+      <div class="form-group">
+        <label for="model-select">AI Model</label>
+        <select id="model-select">
+          <option value="claude-3-5-sonnet-20240620" selected>Claude 3.5 Sonnet (Recommended)</option>
+          <option value="gpt-4">GPT-4</option>
+          <option value="gpt-4o">GPT-4o</option>
+          <option value="gpt-4o-mini">GPT-4o Mini</option>
+          <option value="claude-3-opus-20240229">Claude 3 Opus</option>
+          <option value="claude-3-haiku-20240307">Claude 3 Haiku</option>
+          <option value="mistral-large-latest">Mistral Large</option>
+        </select>
+        <small class="form-help">All models available for free through Puter platform</small>
+      </div>
+
+      <div class="button-group">
+        <button id="connect-btn" class="btn btn-primary">
+          <i data-lucide="zap"></i>
+          Auto-Connect
+        </button>
+        <button id="disconnect-btn" class="btn btn-danger hidden">
+          <i data-lucide="x"></i>
+          Disconnect
+        </button>
+      </div>
+
+      <div id="connection-status" class="status-display hidden"></div>
+    </section>
+
+    <!-- Presentation Generation Section -->
+    <section class="generation-section hidden" id="generation-section">
+      <h3>
+        <i data-lucide="presentation"></i>
+        Generate Presentation
+      </h3>
+
+      <div class="form-group">
+        <label for="presentation-topic">Presentation Topic</label>
+        <textarea id="presentation-topic" rows="4" placeholder="Example: 'The Future of Artificial Intelligence in Healthcare' or 'Introduction to Quantum Computing'"></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group form-group-flex">
+          <label for="slide-count">Number of Slides</label>
+          <select id="slide-count">
+            <option value="4">4 slides</option>
+            <option value="6">6 slides</option>
+            <option value="8" selected>8 slides</option>
+            <option value="10">10 slides</option>
+            <option value="12">12 slides</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button id="enhance-topic-btn" class="btn btn-secondary">
+          <i data-lucide="sparkles"></i>
+          Enhance Topic
+        </button>
+        <button id="generate-presentation-btn" class="btn btn-primary btn-lg">
+          <i data-lucide="zap"></i>
+          Generate Presentation
+        </button>
+        <button id="clear-form-btn" class="btn btn-danger">
+          <i data-lucide="rotate-ccw"></i>
+          Clear Form
+        </button>
+      </div>
+
+      <div id="generation-status" class="status-display hidden"></div>
+    </section>
+
+    <!-- Presentation Details Section -->
+    <section class="details-section hidden" id="presentation-details-section">
+      <h3>
+        <i data-lucide="edit"></i>
+        Presentation Details
+      </h3>
+
+      <div class="form-group">
+        <label for="presentation-name">Presentation Name</label>
+        <input type="text" id="presentation-name" placeholder="Enter presentation name">
+      </div>
+    </section>
+
+    <!-- Slides Navigation -->
+    <section class="slides-section hidden" id="slides-section">
+      <h3>
+        <i data-lucide="layers"></i>
+        Slides
+      </h3>
+
+      <div id="slide-tabs-container" class="tab-container"></div>
+
+      <!-- Canvas Container for Konva -->
+      <div id="konva-container" class="konva-container"></div>
+    </section>
+
+    <!-- Export Section -->
+    <section class="export-section hidden" id="export-section">
+      <h3>
+        <i data-lucide="download"></i>
+        Export & Download
+      </h3>
+
+      <div class="export-grid">
+        <button id="export-markdown-btn" class="btn btn-primary btn-block">
+          <i data-lucide="file-text"></i>
+          Export as Markdown (Pandoc-ready)
+        </button>
+
+        <button id="export-pdf-btn" class="btn btn-primary btn-block">
+          <i data-lucide="file"></i>
+          Export as PDF
+        </button>
+
+        <button id="export-pptx-btn" class="btn btn-primary btn-block">
+          <i data-lucide="presentation"></i>
+          Export as PowerPoint
+        </button>
+
+        <button id="export-html-btn" class="btn btn-secondary btn-block">
+          <i data-lucide="code"></i>
+          Export as HTML
+        </button>
+
+        <button id="export-json-btn" class="btn btn-secondary btn-block">
+          <i data-lucide="brackets"></i>
+          Export Data (JSON)
+        </button>
+      </div>
+
+      <div id="export-status" class="status-display hidden"></div>
+
+      <div class="info-card mt-4">
+        <i data-lucide="info"></i>
+        <div>
+          <h4>Markdown Export Instructions</h4>
+          <p>After downloading the markdown file, you can convert it using pandoc:</p>
+          <pre class="command-block">
+pandoc slides.md -o slides.pdf --pdf-engine=xelatex -t beamer
+pandoc slides.md -o slides.pptx</pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal for confirmation -->
+  <div id="overwrite-modal" class="modal hidden">
+    <div class="modal-content">
+      <h3>
+        <i data-lucide="alert-triangle"></i>
+        Overwrite Existing Content?
+      </h3>
+      <p>You have existing slides. Generating a new presentation will replace the current content.</p>
+      <div class="modal-actions">
+        <button id="modal-cancel-btn" class="btn btn-secondary">
+          <i data-lucide="x"></i>
+          Cancel
+        </button>
+        <button id="modal-confirm-btn" class="btn btn-primary">
+          <i data-lucide="check"></i>
+          Continue
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="../assets/js/pages/puter-slides-page.js"></script>
+  <script>lucide.createIcons();</script>
+</body>
+</html>
