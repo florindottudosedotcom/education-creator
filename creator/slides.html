@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Slides Creator - Create AI-powered presentations">
+  <title>Slides Creator - Emotions for Engineers</title>
+  <link rel="stylesheet" href="assets/css/themes/minimal-theme.css">
+  <script src="assets/js/lucide/lucide.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <a href="index.html" class="back-btn">
+        <i data-lucide="arrow-left"></i>
+        Back to Creator Hub
+      </a>
+      <h1>
+        <i data-lucide="presentation"></i>
+        Slides Creator
+      </h1>
+      <p>Select your AI provider to start creating presentations</p>
+    </header>
+
+    <main>
+      <div class="provider-tabs">
+        <button class="tab-btn active" data-provider="openrouter">
+          <i data-lucide="globe"></i>
+          OpenRouter
+        </button>
+        <button class="tab-btn" data-provider="webllm">
+          <i data-lucide="cpu"></i>
+          WebLLM
+        </button>
+        <button class="tab-btn" data-provider="ollama">
+          <i data-lucide="server"></i>
+          Ollama
+        </button>
+        <button class="tab-btn" data-provider="puter">
+          <i data-lucide="cloud"></i>
+          Puter
+        </button>
+      </div>
+
+      <div class="provider-content">
+        <div class="card text-center" style="padding: var(--spacing-12);">
+          <i data-lucide="info" style="width: 48px; height: 48px; margin: 0 auto var(--spacing-4); color: var(--color-primary);"></i>
+          <h2>Provider Selection</h2>
+          <p>Slides creator interfaces will be implemented in Phase 4.</p>
+          <p class="text-secondary">For now, click on any provider tab above to see the tab switching functionality.</p>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <p>&copy; 2025 Emotions for Engineers. Built with AI-powered education tools.</p>
+    </footer>
+  </div>
+
+  <script type="module">
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Simple tab switching functionality for Phase 1
+    const tabs = document.querySelectorAll('.tab-btn');
+    const savedProvider = localStorage.getItem('selected_slides_provider');
+
+    // Restore saved provider selection
+    if (savedProvider) {
+      tabs.forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.provider === savedProvider);
+      });
+    }
+
+    // Tab click handlers
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const provider = tab.dataset.provider;
+
+        // Update active state
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        // Save selection
+        localStorage.setItem('selected_slides_provider', provider);
+
+        console.log(`Selected slides provider: ${provider}`);
+      });
+    });
+  </script>
+</body>
+</html>
