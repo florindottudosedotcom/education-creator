@@ -17,17 +17,33 @@ export class SlidesManager {
    * @param {HTMLElement} container - Container element
    */
   async initKonva(container) {
-    // Dynamically import Konva
-    const Konva = (await import('https://unpkg.com/konva@9/konva.esm.js')).default;
+    // Load Konva if not already loaded
+    if (typeof window.Konva === 'undefined') {
+      await this.loadKonva();
+    }
 
-    this.stage = new Konva.Stage({
+    this.stage = new window.Konva.Stage({
       container: container.id,
       width: container.offsetWidth || 800,
       height: 600
     });
 
-    this.layer = new Konva.Layer();
+    this.layer = new window.Konva.Layer();
     this.stage.add(this.layer);
+  }
+
+  /**
+   * Load Konva library dynamically
+   * @private
+   */
+  async loadKonva() {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = '../assets/js/konva/konva.min.js';
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
   }
 
   /**
@@ -69,8 +85,7 @@ export class SlidesManager {
     const slide = this.slides[this.currentSlide];
     if (!slide) return;
 
-    // Dynamically import Konva
-    const Konva = (await import('https://unpkg.com/konva@9/konva.esm.js')).default;
+    const Konva = window.Konva;
 
     // Background
     const background = new Konva.Rect({
